@@ -1,10 +1,21 @@
+from tkinter import CASCADE
 from django.db import models
 
 # Create your models here.
 
 
+class Gazeteci(models.Model):
+    isim = models.CharField(max_length=150)
+    soyisim = models.CharField(max_length=150)
+    biyografi = models.TextField(max_length=1500)
+
+    def __str__(self):
+        return f'{self.isim}  {self.soyisim}'
+
+
 class Makale(models.Model):
-    yazar = models.CharField(max_length=150)
+    yazar = models.ForeignKey(
+        Gazeteci, on_delete=models.CASCADE, related_name='makaleler', null=True, blank=True)
     baslik = models.CharField(max_length=150)
     aciklama = models.CharField(max_length=250)
     metin = models.TextField()

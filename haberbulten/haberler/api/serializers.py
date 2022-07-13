@@ -1,7 +1,7 @@
 from dataclasses import fields
 from pyexpat import model
 from rest_framework import serializers
-from ..models import Makale
+from ..models import Gazeteci, Makale
 from datetime import date, datetime
 from django.utils.timesince import timesince
 from django.utils.timezone import localdate
@@ -14,6 +14,7 @@ from pytz import UTC
 class MakaleSerializer(serializers.ModelSerializer):
 
     time_since_pub = serializers.SerializerMethodField()
+    #yazar = serializers.StringRelatedField()
 
     class Meta:
         model = Makale
@@ -80,3 +81,13 @@ class MakaleDefaultSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 f'Başlık 20 karakterden kısa olamaz. Siz {len(value)} karakter girdiniz. ')
         return value
+
+
+class GazeteSerializer(serializers.ModelSerializer):
+
+    makaleler = serializers.HyperlinkedRelatedField(
+        view_name='makale-detay', read_only=True, many=True)
+
+    class Meta:
+        model = Gazeteci
+        fields = '__all__'
