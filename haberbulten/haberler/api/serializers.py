@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Makale
+from ..models import Makale
 
 
 class MakaleSerializer(serializers.Serializer):
