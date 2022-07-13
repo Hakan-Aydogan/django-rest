@@ -28,3 +28,15 @@ class MakaleSerializer(serializers.Serializer):
             'guncellenme_tarihi', instance.guncellenme_tarihi)
         instance.save()
         return instance
+
+    def vaidate(self, data):
+        if data['baslik'] == data['aciklama']:
+            raise serializers.ValidationError(
+                'Başlık ve açıklama aynı olamaz!!!!')
+        return data
+
+    def validate_baslik(self, value):
+        if len(value) < 20:
+            raise serializers.ValidationError(
+                f'Başlık 20 karakterden kısa olamaz. Siz {len(value)} karakter girdiniz. ')
+        return value
