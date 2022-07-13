@@ -1,8 +1,48 @@
+from dataclasses import fields
+from pyexpat import model
 from rest_framework import serializers
 from ..models import Makale
+from datetime import date, datetime
+from django.utils.timesince import timesince
+from django.utils.timezone import localdate
+from pytz import UTC
 
 
-class MakaleSerializer(serializers.Serializer):
+# modelSerializer
+
+
+class MakaleSerializer(serializers.ModelSerializer):
+
+    time_since_pub = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Makale
+        fields = '__all__'
+        # fields= ['yazar', 'baslik' ,'aciklama']
+        # exclude=['yazar', 'baslik' ,'aciklama']
+        read_only_fields = ['id', 'yayinlanma_tarihi', 'guncellenme_tarihi']
+
+    def get_time_since_pub(self, object):
+        now = datetime.utcnow().replace(tzinfo=UTC)
+        pub_date = object.yayinlanma_tarihi
+
+        if object.aktif:
+            time_delta = timesince(pub_date, now)
+            return time_delta
+
+        else:
+            return 'Aktif değil'
+
+    def validate_yayinlanma_tarihi(self, tarih):
+        today = date.today()
+        if tarih > today:
+            raise serializers.ValidationError(
+                'Yaınlanma tarihi bugünün tarihinden büyük olamaz. ')
+        return tarih
+
+
+# standart serializer
+class MakaleDefaultSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     yazar = serializers.CharField()
     baslik = serializers.CharField()
